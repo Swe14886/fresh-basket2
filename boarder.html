@@ -217,6 +217,8 @@
     <button class="pay-now" onclick="buyAndPay()">Buy &amp; Pay Now</button>
   </div>
   
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
   <!-- Profile Section -->
   <div id="profileSection" class="section">
     <h2>👤 Your Profile</h2>
@@ -241,6 +243,48 @@
 
   <!-- JavaScript Section -->
   <script>
+    function buyAndPay() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+  
+      let total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+      let amountInPaise = total * 100; // Razorpay expects amount in paise
+  
+      let options = {
+        key: "rzp_test_Qz9CsXYVeXXkv6", // Your Razorpay test key
+        amount: amountInPaise.toFixed(0), // Amount in paise (e.g., 50000 = ₹500)
+        currency: "INR",
+        name: "Your Store",
+        description: "Cart Checkout Payment",
+        image: "https://your-logo-url.com/logo.png", // Optional logo
+        handler: function (response) {
+          alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+          cart = []; // Clear the cart
+          updateCartUI(); // Refresh cart display
+        },
+        prefill: {
+          name: "Customer Name",
+          email: "customer@example.com",
+          contact: "9123456789"
+        },
+        theme: {
+          color: "#3399cc"
+        }
+      };
+  
+      let rzp = new Razorpay(options);
+      rzp.open();
+    }
+
+
+
+
+
+  
+
+  
     // Data Arrays
     const groceryItems = [
       { id: 1, name: "Tomato", price: 20, image: "https://d2jx2rerrg6sh3.cloudfront.net/images/news/ImageForNews_790979_17267935077451310.jpg" },
@@ -348,19 +392,7 @@
       cartCount.textContent = cart.length;
     }
     
-    // Simulated checkout
-    function buyAndPay() {
-      if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-      }
-      let total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-      if (confirm(`Proceed to payment of ₹${total.toFixed(2)}?`)) {
-        alert("Payment processing... Thank you for your purchase!");
-        cart = [];
-        updateCartUI();
-      }
-    }
+   
     
     // --- Section Toggling ---
     function hideAllSections() {
